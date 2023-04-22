@@ -1,5 +1,5 @@
+package com.bettblake08.istanbulcc
 
-import com.bettblake08.istanbulcc.IstanbulCoverageReport
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.markup.HighlighterLayer
@@ -19,6 +19,7 @@ class CodeHighlighter(
     private val document: Document,
     private val fileCoverage: IstanbulCoverageReport.FileCoverage
 ) {
+
     /**
      * This method highlights the lines of code in the file based on the coverage data.
      * If a line, branch, or statement is covered, highlight the code with a green background color.
@@ -27,29 +28,18 @@ class CodeHighlighter(
     fun highlightCoverage() {
         val markupModel = editor.markupModel
         val textAttributes = TextAttributes()
-        val statementColor = JBColor(0x72c872, 0x398639)
-        val branchColor = JBColor(0x94b8ff, 0x3c4f9e)
-        val uncoveredColor = JBColor(0xff6666, 0xff6666)
 
-        for (lineNumber in 1..document.lineCount) {
+        for (lineCount in 1..document.lineCount) {
+            val lineNumber = lineCount - 1
             val statementHits = fileCoverage.s[lineNumber]
             val functionHits = fileCoverage.f[lineNumber]
             val branchHits = fileCoverage.b[lineNumber]
 
-            val lineStartOffset = document.getLineStartOffset(lineNumber - 1)
-            val lineEndOffset = document.getLineEndOffset(lineNumber - 1)
+            val lineStartOffset = document.getLineStartOffset(lineNumber)
+            val lineEndOffset = document.getLineEndOffset(lineNumber)
 
-            if (statementHits != null && statementHits > 0) {
-                textAttributes.backgroundColor = statementColor
-                markupModel.addRangeHighlighter(
-                    lineStartOffset,
-                    lineEndOffset,
-                    HighlighterLayer.SYNTAX,
-                    textAttributes,
-                    HighlighterTargetArea.EXACT_RANGE
-                )
-            } else if (functionHits != null && functionHits > 0) {
-                textAttributes.backgroundColor = statementColor
+            if ((statementHits != null && statementHits > 0) || (functionHits != null && functionHits > 0)) {
+                textAttributes.backgroundColor = COVERAGE_COLOR.STATEMENT.color
                 markupModel.addRangeHighlighter(
                     lineStartOffset,
                     lineEndOffset,
@@ -60,7 +50,7 @@ class CodeHighlighter(
             } else if (branchHits != null && branchHits.isNotEmpty()) {
                 for (i in branchHits.indices) {
                     if (branchHits[i] > 0) {
-                        textAttributes.backgroundColor = branchColor
+                        textAttributes.backgroundColor = COVERAGE_COLOR.BRANCH.color
                         markupModel.addRangeHighlighter(
                             lineStartOffset,
                             lineEndOffset,
@@ -72,7 +62,7 @@ class CodeHighlighter(
                     }
                 }
             } else {
-                textAttributes.backgroundColor = uncoveredColor
+                textAttributes.backgroundColor = COVERAGE_COLOR.UNCOVERED.color
                 markupModel.addRangeHighlighter(
                     lineStartOffset,
                     lineEndOffset,
@@ -82,5 +72,11 @@ class CodeHighlighter(
                 )
             }
         }
+    }
+
+    enum class COVERAGE_COLOR(val color: JBColor) {
+        STATEMENT(JBColor(0x72c872, 0x398639)),
+        BRANCH(JBColor(0x72c872, 0x398639)),
+        UNCOVERED(JBColor(0x72c872, 0x398639))
     }
 }
