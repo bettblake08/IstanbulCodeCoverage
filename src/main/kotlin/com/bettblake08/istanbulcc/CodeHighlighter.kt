@@ -30,13 +30,13 @@ class CodeHighlighter(
         val textAttributes = TextAttributes()
 
         for (lineCount in 1..document.lineCount) {
-            val lineNumber = lineCount - 1
-            val statementHits = fileCoverage.s[lineNumber]
-            val functionHits = fileCoverage.f[lineNumber]
-            val branchHits = fileCoverage.b[lineNumber]
+            val lineIndex = lineCount - 1
+            val statementHits = fileCoverage.s[lineIndex]
+            val functionHits = fileCoverage.f[lineIndex]
+            val branchHits = fileCoverage.b[lineIndex]
 
-            val lineStartOffset = document.getLineStartOffset(lineNumber)
-            val lineEndOffset = document.getLineEndOffset(lineNumber)
+            val lineStartOffset = document.getLineStartOffset(lineIndex)
+            val lineEndOffset = document.getLineEndOffset(lineIndex)
 
             if ((statementHits != null && statementHits > 0) || (functionHits != null && functionHits > 0)) {
                 textAttributes.backgroundColor = COVERAGE_COLOR.STATEMENT.color
